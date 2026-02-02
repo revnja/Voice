@@ -1,160 +1,153 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Voice & Text Converter</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice & Text Converter</title>
 
-  <!-- ===== DESAIN (SUDAH FIX MOBILE) ===== -->
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
-    body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6a7cff, #8f6cff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-      display: flex;
-      justify-content: center;
+/* CARD UTAMA (DIBESARIN) */
+.container {
+  width: 92%;
+  max-width: 420px;
+  background: #0f0f0f;
+  border-radius: 18px;
+  padding: 22px;
+  color: #fff;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
 
-      /* FIX UTAMA */
-      min-height: 100vh;
-      padding: 30px 15px;
-      margin: 0;
-      overflow-y: auto;
-    }
+/* JUDUL */
+h2 {
+  text-align: center;
+  margin: 10px 0 14px;
+  font-size: 20px;
+}
 
-    .box {
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
-      width: 100%;
-      max-width: 370px;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.25);
-      text-align: center;
-      animation: fadeIn 0.6s ease;
-      margin: auto;
-    }
+/* TEXTAREA (DIBESARIN) */
+textarea {
+  width: 100%;
+  height: 140px;
+  resize: none;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  background: #2c2c2c;
+  color: #fff;
+  outline: none;
+}
 
-    h2 {
-      margin: 10px 0;
-      color: #333;
-    }
+/* GARIS PEMISAH */
+hr {
+  border: none;
+  height: 1px;
+  background: #333;
+  margin: 20px 0;
+}
 
-    textarea {
-      width: 100%;
-      height: 120px;
-      margin-top: 12px;
-      padding: 12px;
-      font-size: 14px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      resize: none;
-      outline: none;
-    }
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
 
-    textarea:focus {
-      border-color: #667eea;
-    }
+/* BUTTON WARNA */
+.btn-record {
+  background: #6a7cff;
+  color: white;
+}
 
-    button {
-      width: 100%;
-      margin-top: 12px;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: bold;
-      transition: 0.3s;
-    }
+.btn-record:hover {
+  background: #5a6cff;
+}
 
-    button:first-of-type {
-      background: #667eea;
-      color: white;
-    }
+.btn-speak {
+  background: #2fb34a;
+  color: white;
+}
 
-    button:first-of-type:hover {
-      background: #5563d6;
-    }
+.btn-speak:hover {
+  background: #28a140;
+}
 
-    button:last-of-type {
-      background: #28a745;
-      color: white;
-    }
-
-    button:last-of-type:hover {
-      background: #1e7e34;
-    }
-
-    hr {
-      margin: 20px 0;
-      border: none;
-      height: 1px;
-      background: #ddd;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-  </style>
+/* RESPONSIVE HP KECIL */
+@media (max-width: 360px) {
+  .container {
+    padding: 18px;
+  }
+  textarea {
+    height: 120px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="container">
+
+  <!-- VOICE TO TEXT -->
   <h2>🎤 Voice to Text</h2>
-  <button onclick="startSpeech()">Mulai Rekam</button>
-  <textarea id="hasil" placeholder="Hasil suara akan muncul di sini..."></textarea>
+  <button class="btn-record" onclick="startRecord()">Mulai Rekam</button>
+
+  <textarea id="result" placeholder="Hasil suara akan muncul di sini..."></textarea>
 
   <hr>
 
+  <!-- TEXT TO VOICE -->
   <h2>🔊 Text to Voice</h2>
-  <button onclick="textToVoice()">Putar Suara</button>
+  <button class="btn-speak" onclick="speakText()">Putar Suara</button>
+
 </div>
 
 <script>
-  // ===== FITUR LAMA (TIDAK DIUBAH) =====
-  function startSpeech() {
-    if (!('webkitSpeechRecognition' in window)) {
-      alert("Browser tidak mendukung voice recognition");
-      return;
-    }
+/* VOICE TO TEXT (TIDAK DIUBAH LOGIKANYA) */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
 
-    const recognition = new webkitSpeechRecognition();
-    recognition.lang = "id-ID";
-    recognition.continuous = false;
-    recognition.interimResults = false;
+recognition.lang = "id-ID";
+recognition.continuous = false;
+recognition.interimResults = false;
 
-    recognition.onresult = function(event) {
-      document.getElementById("hasil").value = event.results[0][0].transcript;
-    };
+function startRecord() {
+  recognition.start();
+}
 
-    recognition.start();
-  }
+recognition.onresult = function(event) {
+  document.getElementById("result").value = event.results[0][0].transcript;
+};
 
-  // ===== FITUR BARU (TETAP SAMA) =====
-  function textToVoice() {
-    const text = document.getElementById("hasil").value;
-    if (text === "") {
-      alert("Teks masih kosong!");
-      return;
-    }
+/* TEXT TO VOICE */
+function speakText() {
+  const text = document.getElementById("result").value;
+  if (text.trim() === "") return;
 
-    const speech = new SpeechSynthesisUtterance(text);
-    speech.lang = "id-ID";
-    speech.rate = 1;
-    speech.pitch = 1;
-
-    window.speechSynthesis.speak(speech);
-  }
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "id-ID";
+  window.speechSynthesis.speak(speech);
+}
 </script>
 
 </body>
